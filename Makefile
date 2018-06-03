@@ -1127,6 +1127,8 @@ help:
 	@echo '  legal-info             - generate info about license compliance'
 	@echo '  show-info              - generate info about packages, as a JSON blurb'
 	@echo '  printvars              - dump internal variables selected with VARS=...'
+	@echo '  docker4buildroot       - build docker images of some distros, with all the'
+	@echo '                           packages needed to use Buildroot already installed'
 	@echo
 	@echo '  make V=0|1             - 0 => quiet build (default), 1 => verbose build'
 	@echo '  make O=dir             - Locate all output files in "dir", including .config'
@@ -1188,6 +1190,17 @@ check-package:
 .PHONY: .gitlab-ci.yml
 .gitlab-ci.yml: .gitlab-ci.yml.in
 	./support/scripts/generate-gitlab-ci-yml $< > $@
+
+.PHONY: docker4buildroot
+docker4buildroot:
+	@if [ -z "$(BR2_DOCKER_VERSION)" ]; then \
+		printf "Please, set the version of the docker images with BR2_DOCKER_VERSION\n"; \
+		exit 1; \
+	fi
+	for d in support/docker/Dockerfile.*; do \
+		docker build -t "buildroot/$${d#*/Dockerfile.}:$(BR2_DOCKER_VERSION)" \
+			     -f "$${d}" "$${d%/*}" || exit 1; \
+	done
 
 include docs/manual/manual.mk
 -include $(foreach dir,$(BR2_EXTERNAL_DIRS),$(sort $(wildcard $(dir)/docs/*/*.mk)))
