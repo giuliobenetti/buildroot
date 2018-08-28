@@ -1,0 +1,30 @@
+From 5fd3fd4497ae16ee7d0d4f1a864f4d8f6d80cee5 Mon Sep 17 00:00:00 2001
+From: Giulio Benetti <giulio.benetti@micronovasrl.com>
+Date: Tue, 28 Aug 2018 22:01:53 +0200
+Subject: [PATCH] snmp: replace U64 with struct counter64
+
+U64 is not always present in toolchains and can conflict with new perl.
+
+Replace it with struct counter64.
+
+Signed-off-by: Giulio Benetti <giulio.benetti@micronovasrl.com>
+---
+ src/dep/snmp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/dep/snmp.c b/src/dep/snmp.c
+index 5c08aaa..3086c86 100644
+--- a/src/dep/snmp.c
++++ b/src/dep/snmp.c
+@@ -221,7 +221,7 @@ snmpHeaderIndexBest(struct snmpHeaderIndex *idx)
+ 
+ #define SNMP_LOCAL_VARIABLES			\
+ 	static unsigned long long_ret;		\
+-	static U64 counter64_ret;		\
++	static struct counter64 counter64_ret;	\
+ 	static uint32_t ipaddr;			\
+ 	Integer64 bigint;			\
+ 	struct snmpHeaderIndex idx;		\
+-- 
+2.17.1
+
