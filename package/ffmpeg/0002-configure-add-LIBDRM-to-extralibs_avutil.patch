@@ -1,0 +1,44 @@
+From f4c9a7f55229d5275edb89c29ac9b18a737faf65 Mon Sep 17 00:00:00 2001
+From: Giulio Benetti <giulio.benetti@micronovasrl.com>
+Date: Tue, 11 Sep 2018 19:22:27 +0200
+Subject: [PATCH] configure: add LIBDRM to extralibs_avutil
+
+When static linking programs using ffmpeg libraries, if linking against
+libavutil, -ldrm is listed before -lavutil. This leads to linking failure
+due to undefined reference of drmGetVersion() and drmFreeVersion().
+This is why when pkg-config create libavutil.pc doesn't append -ldrm
+after -lavutil.
+
+Add -ldrm to LIBDRM in case libdrm is enabled and add $LIBDRM to
+extralibs_avutil.
+
+Signed-off-by: Giulio Benetti <giulio.benetti@micronovasrl.com>
+---
+ configure | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 7377046d0a..7599fcc2bd 100755
+--- a/configure
++++ b/configure
+@@ -5919,7 +5919,7 @@ enabled libcelt           && require libcelt celt/celt.h celt_decode -lcelt0 &&
+                                die "ERROR: libcelt must be installed and version must be >= 0.11.0."; }
+ enabled libcaca           && require_pkg_config libcaca caca caca.h caca_create_canvas
+ enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
+-enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
++enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion && LIBDRM="-ldrm"
+ enabled libfdk_aac        && { use_pkg_config libfdk_aac fdk-aac "fdk-aac/aacenc_lib.h" aacEncOpen ||
+                                { require libfdk_aac fdk-aac/aacenc_lib.h aacEncOpen -lfdk-aac &&
+                                  warn "using libfdk without pkg-config"; } }
+@@ -7096,7 +7096,7 @@ source_path=${source_path}
+ LIBPREF=${LIBPREF}
+ LIBSUF=${LIBSUF}
+ 
+-extralibs_avutil="$LIBRT $LIBM"
++extralibs_avutil="$LIBDRM $LIBRT $LIBM"
+ extralibs_avcodec="$extralibs"
+ extralibs_avformat="$extralibs"
+ extralibs_avdevice="$extralibs"
+-- 
+2.17.1
+
