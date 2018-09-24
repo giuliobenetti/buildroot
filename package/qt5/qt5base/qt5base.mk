@@ -24,8 +24,7 @@ QT5BASE_CONFIGURE_OPTS += \
 	-no-iconv \
 	-system-zlib \
 	-system-pcre \
-	-no-pch \
-	-shared
+	-no-pch
 
 ifeq ($(BR2_PACKAGE_QT5_VERSION_5_6),y)
 QT5BASE_DEPENDENCIES += pcre
@@ -41,6 +40,14 @@ QT5BASE_CONFIGURE_OPTS += -kms -gbm
 QT5BASE_DEPENDENCIES += mesa3d
 else
 QT5BASE_CONFIGURE_OPTS += -no-kms
+endif
+
+ifeq ($(BR2_STATIC_LIBS),y)
+QT5BASE_CONFIGURE_OPTS += -static
+else
+# We apparently can't build both the shared and static variants of the
+# library.
+QT5BASE_CONFIGURE_OPTS += -shared
 endif
 
 ifeq ($(BR2_ENABLE_DEBUG),y)
