@@ -1,0 +1,63 @@
+From 94f3ddc3341263ec5b977d2b5008cc5471ed17cc Mon Sep 17 00:00:00 2001
+From: Giulio Benetti <giulio.benetti@micronovasrl.com>
+Date: Mon, 24 Sep 2018 23:12:47 +0200
+Subject: [PATCH] fork: try to use vfork() instead of fork() for mmu-less cpus
+
+On mmu-less cpus fork() is not available.
+
+Substitute fork() with vfork(), paying the price to wait until vfork()
+finished and sharing same memory than parent process.
+
+Signed-off-by: Giulio Benetti <giulio.benetti@micronovasrl.com>
+---
+ src/3rdparty/forkfd/forkfd.c     | 4 ++--
+ src/corelib/io/qprocess_unix.cpp | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/3rdparty/forkfd/forkfd.c b/src/3rdparty/forkfd/forkfd.c
+index bef109e401..f781262318 100644
+--- a/src/3rdparty/forkfd/forkfd.c
++++ b/src/3rdparty/forkfd/forkfd.c
+@@ -451,7 +451,7 @@ static void ignore_sigpipe()
+ static void forkfd_initialize()
+ {
+ #if defined(HAVE_BROKEN_WAITID)
+-    pid_t pid = fork();
++    pid_t pid = vfork();
+     if (pid == 0) {
+         _exit(0);
+     } else if (pid > 0) {
+@@ -693,7 +693,7 @@ int forkfd(int flags, pid_t *ppid)
+     }
+ 
+     /* now fork */
+-    pid = fork();
++    pid = vfork();
+     if (pid == -1)
+         goto err_close2; /* failed to fork, pass errno */
+     if (ppid)
+diff --git a/src/corelib/io/qprocess_unix.cpp b/src/corelib/io/qprocess_unix.cpp
+index a849519635..00cb144d8e 100644
+--- a/src/corelib/io/qprocess_unix.cpp
++++ b/src/corelib/io/qprocess_unix.cpp
+@@ -932,7 +932,7 @@ bool QProcessPrivate::startDetached(qint64 *pid)
+         return false;
+     }
+ 
+-    pid_t childPid = fork();
++    pid_t childPid = vfork();
+     if (childPid == 0) {
+         struct sigaction noaction;
+         memset(&noaction, 0, sizeof(noaction));
+@@ -944,7 +944,7 @@ bool QProcessPrivate::startDetached(qint64 *pid)
+         qt_safe_close(startedPipe[0]);
+         qt_safe_close(pidPipe[0]);
+ 
+-        pid_t doubleForkPid = fork();
++        pid_t doubleForkPid = vfork();
+         if (doubleForkPid == 0) {
+             qt_safe_close(pidPipe[1]);
+ 
+-- 
+2.17.1
+
