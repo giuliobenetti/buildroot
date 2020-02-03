@@ -159,6 +159,14 @@ config BR2_TOOLCHAIN_HAS_GCC_BUG_90620
 	bool
 	default y if BR2_microblaze
 
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93532
+# An infinite loop exists on riscv32 gcc. This doesn't manifest on gcc 9.x
+# http://autobuild.buildroot.net/results/9a4/9a405ec6fabfa306c14a671a5e09359ac623c25b/
+config BR2_TOOLCHAIN_HAS_GCC_BUG_93532
+	bool
+	default y if BR2_RISCV_32
+	depends on !BR2_TOOLCHAIN_GCC_AT_LEAST_9
+
 config BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	bool
 
