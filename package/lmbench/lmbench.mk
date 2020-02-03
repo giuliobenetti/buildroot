@@ -28,6 +28,10 @@ define LMBENCH_CONFIGURE_CMDS
 	touch $@
 endef
 
+ifeq ($(BR2_TOOLCHAIN_HAS_GCC_BUG_93532),y)
+LMBENCH_CFLAGS += -O0
+endif
+
 # Note: there is a second stage 'make' invocation from the 'scripts/build'
 # script. So the variables override below don't take direct effect in
 # src/Makefile.
