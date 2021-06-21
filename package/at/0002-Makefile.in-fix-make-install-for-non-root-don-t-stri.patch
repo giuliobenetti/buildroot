@@ -1,33 +1,39 @@
-[PATCH]: Makefile.in: fix make install for non-root, don't strip
+From daae0a5a26ad78c05adb0eb1fc6cad1896e3766a Mon Sep 17 00:00:00 2001
+From: Giulio Benetti <giulio.benetti@benettiengineering.com>
+Date: Mon, 21 Jun 2021 19:33:23 +0200
+Subject: [PATCH] Makefile.in: fix make install for non-root, don't strip
 
 Buildroot will ensure all files are owned by root and stripped anyway
 (if needed) before the rootfs is created.
 
-[Vincent: tweak the patch for the new version]
-
 Signed-off-by: Peter Korsgaard <jacmet@sunsite.dk>
 Signed-off-by: Vicente Olivert Riera <Vincent.Riera@imgtec.com>
+[Vincent: tweak the patch for the new version]
+Signed-off-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
+[Giulio: tweak patch for version 3.2.2]
 ---
- Makefile.in | 43 +++++++++++++++++++++----------------------
- 1 file changed, 21 insertions(+), 22 deletions(-)
+ Makefile.in | 47 +++++++++++++++++++++++------------------------
+ 1 file changed, 23 insertions(+), 24 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 1f699d9..f313f9b 100644
+index 24ee40c..f634c74 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -95,41 +95,40 @@ atrun: atrun.in
+@@ -100,43 +100,42 @@ atrun: atrun.in
  	$(CC) -c $(CFLAGS) $(DEFS) $*.c
  
  install: all
 -	$(INSTALL) -g root -o root -m 755 -d $(DESTDIR)$(etcdir)
 -	$(INSTALL) -g root -o root -m 755 -d $(DESTDIR)$(bindir)
 -	$(INSTALL) -g root -o root -m 755 -d $(DESTDIR)$(sbindir)
+-	$(INSTALL) -g root -o root -m 755 -d $(DESTDIR)$(atdatadir)
 -	$(INSTALL) -g root -o root -m 755 -d $(DESTDIR)$(docdir)
 -	$(INSTALL) -g root -o root -m 755 -d $(DESTDIR)$(atdocdir)
 -	$(INSTALL) -g $(DAEMON_GROUPNAME) -o $(DAEMON_USERNAME) -m 755 -d $(DESTDIR)$(ATSPOOL_DIR) $(DESTDIR)$(ATJOB_DIR)
 +	$(INSTALL) -m 755 -d $(DESTDIR)$(etcdir)
 +	$(INSTALL) -m 755 -d $(DESTDIR)$(bindir)
 +	$(INSTALL) -m 755 -d $(DESTDIR)$(sbindir)
++	$(INSTALL) -m 755 -d $(DESTDIR)$(atdatadir)
 +	$(INSTALL) -m 755 -d $(DESTDIR)$(docdir)
 +	$(INSTALL) -m 755 -d $(DESTDIR)$(atdocdir)
 +	$(INSTALL) -m 755 -d $(DESTDIR)$(ATSPOOL_DIR) $(DESTDIR)$(ATJOB_DIR)
@@ -42,6 +48,7 @@ index 1f699d9..f313f9b 100644
  	$(LN_S) -f at $(DESTDIR)$(bindir)/atq
  	$(LN_S) -f at $(DESTDIR)$(bindir)/atrm
 -	$(INSTALL) -g root -o root -m 755 batch $(DESTDIR)$(bindir)
+-	$(INSTALL) -g root -o root -m 755 batch-job $(DESTDIR)$(atdatadir)
 -	$(INSTALL) -d -o root -g root -m 755 $(DESTDIR)$(man1dir)
 -	$(INSTALL) -d -o root -g root -m 755 $(DESTDIR)$(man5dir)
 -	$(INSTALL) -d -o root -g root -m 755 $(DESTDIR)$(man8dir)
@@ -49,6 +56,7 @@ index 1f699d9..f313f9b 100644
 -	$(INSTALL) -g root -o root -m 755 atrun $(DESTDIR)$(sbindir)
 -	$(INSTALL) -g root -o root -m 644 at.1 $(DESTDIR)$(man1dir)/
 +	$(INSTALL) -m 755 batch $(DESTDIR)$(bindir)
++	$(INSTALL) -m 755 batch-job $(DESTDIR)$(atdatadir)
 +	$(INSTALL) -d -m 755 $(DESTDIR)$(man1dir)
 +	$(INSTALL) -d -m 755 $(DESTDIR)$(man5dir)
 +	$(INSTALL) -d -m 755 $(DESTDIR)$(man8dir)
@@ -79,5 +87,5 @@ index 1f699d9..f313f9b 100644
  
  dist: checkin $(DIST) $(LIST) Filelist.asc
 -- 
-2.4.10
+2.25.1
 
